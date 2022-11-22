@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Menu } from 'electron'
 import '../renderer/store'
 
 /**
@@ -31,6 +31,9 @@ function createWindow () {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+
+  // 取消默认菜单栏
+  Menu.setApplicationMenu(null)
 }
 
 app.on('ready', createWindow)

@@ -6,13 +6,28 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: 'landing-page',
-      component: require('@/components/LandingPage').default
+      path: '/login',
+      name: 'login-page',
+      component: require('@/views/LoginPage.vue').default,
+      beforeEnter: (to, from, next) => {
+        let cookie = document.cookie.split(';')[0]
+        if (cookie.length === 0) next()
+        else {
+          next({path: '/'})
+        }
+      }
     },
     {
-      path: '*',
-      redirect: '/'
+      path: '/',
+      name: 'console-page',
+      component: require('@/views/ConsolePage.vue').default
+      // beforeEnter: (to, from, next) => {
+      //   let cookie = document.cookie.split(';')[0]
+      //   if (cookie.length === 0) next({path: '/login'})
+      //   else {
+      //     next()
+      //   }
+      // }
     }
   ]
 })

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import SystemInformation from './LandingPage/LoginFormComponent'
+import SystemInformation from '../components/LandingPage/LoginFormComponent'
 
 export default {
   name: 'landing-page',
