@@ -6,7 +6,7 @@
         <span class="title">
           欢迎使用广西大学在线监考系统!
         </span>
-        <system-information></system-information>
+        <login-form-component></login-form-component>
       </div>
 
       <div class="right-side">
@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import SystemInformation from '../components/LandingPage/LoginFormComponent'
+import LoginFormComponent from '../components/LandingPage/LoginFormComponent'
 
 export default {
   name: 'landing-page',
-  components: { SystemInformation },
+  components: { LoginFormComponent },
   methods: {
     open (link) {
       this.$electron.shell.openExternal(link)

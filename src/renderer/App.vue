@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: 'ois'
+    name: 'OIS'
   }
 </script>
 

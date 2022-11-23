@@ -1,51 +1,25 @@
 <template>
   <el-container style="height: 100%">
-    <el-aside width="400px">Aside</el-aside>
+    <el-aside width="400px"><console-aside-component></console-aside-component></el-aside>
     <el-container>
-      <el-main>Main</el-main>
-      <el-footer>Footer</el-footer>
+      <el-main><console-main-component></console-main-component></el-main>
+      <el-footer><console-footer-component></console-footer-component></el-footer>
     </el-container>
   </el-container>
 </template>
 
 <script>
+import ConsoleFooterComponent from '@/components/FooterPage/ConsoleFooterComponent.vue'
+import ConsoleMainComponent from '@/components/MainPage/ConsoleMainComponent.vue'
+import ConsoleAsideComponent from '@/components/AsidePage/ConsoleUserInformationComponent.vue'
 export default {
+  components: {ConsoleFooterComponent, ConsoleMainComponent, ConsoleAsideComponent},
   methods: {
   }
 }
 </script>
 <style>
-.el-header, .el-footer {
-  background-color: #B3C0D1;
-  color: #333;
-  text-align: center;
-  line-height: 60px;
-}
-
-.el-aside {
-  background-color: #D3DCE6;
-  color: #333;
-  text-align: center;
-  line-height: 200px;
-}
-
-.el-main {
-  background-color: #E9EEF3;
-  color: #333;
-  text-align: center;
-  line-height: 160px;
-}
-
-body > .el-container {
-  margin-bottom: 40px;
-}
-
-.el-container:nth-child(5) .el-aside,
-.el-container:nth-child(6) .el-aside {
-  line-height: 260px;
-}
-
-.el-container:nth-child(7) .el-aside {
-  line-height: 320px;
+html,body,#app {
+  height: 100%;
 }
 </style>
