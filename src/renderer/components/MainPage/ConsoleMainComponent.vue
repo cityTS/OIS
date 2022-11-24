@@ -16,6 +16,23 @@ export default {
     return {
       textarea: ''
     }
+  },
+  mounted () {
+    this.getMainProcessLogs()
+  },
+  methods: {
+     getMainProcessLogs () {
+      window.electronAPI.getLogs((event, value) => {
+        this.textarea = value + '\n' + this.textarea
+      })
+      // if (logs.length !== 0) {
+      //   let text = ''
+      //   for (let i = 0; i < logs.length; i++) {
+      //     text += logs[i]
+      //   }
+      //   this.textarea = text
+      // }
+    }
   }
 }
 </script>
@@ -25,7 +42,8 @@ export default {
   min-height: 400px !important;
   /*overflow-y: hidden*/
 }
-.logo  p {
+
+.logo p {
   font-size: 25px;
 }
 </style>

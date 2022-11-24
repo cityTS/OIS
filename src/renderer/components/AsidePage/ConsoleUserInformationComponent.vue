@@ -1,16 +1,32 @@
 <template>
-  <div class="big-video" id="big-video"> <video></video> </div>
-
+  <div class="jk">
+    <div class="big-video" id="big-video" style="width: 100%;margin-top: 110px">
+      <video id="screen" style="width: 100%"></video>
+    </div>
+<!--    TODO 摄像头源-->
+<!--    <div class="big-video" id="big-video" style="width: 100%; margin-top: 110px">-->
+<!--      <video id="camera" style="width: 100%"></video>-->
+<!--    </div>-->
+  </div>
 </template>
 <script>
 import {desktopCapturer} from 'electron'
+
 export default {
+  mounted () {
+    this.screenSharing()
+  },
   methods: {
     screenSharing () {
       desktopCapturer.getSources({types: ['window', 'screen']}).then((sources) => {
         console.log(sources)
-        const source = sources.find(item => item === 'Screen 2')
-        this.getInitStream(source)
+        for (const source of sources) {
+          if (source.name === 'Entire Screen') {
+            this.getInitStream(source)
+            return
+          }
+        }
+        // const source = sources.find(item => item.name === 'Screen 2')
       })
     },
     getInitStream (source) {
@@ -28,7 +44,7 @@ export default {
       })
     },
     previewStream (stream) {
-      const video = document.querySelector('video')
+      const video = document.getElementById('screen')
       // const video = this.$el.querySelector('video')
       video.srcObject = stream
       video.onloadedmetadata = e => video.play()
@@ -36,3 +52,7 @@ export default {
   }
 }
 </script>
+
+<style>
+
+</style>
