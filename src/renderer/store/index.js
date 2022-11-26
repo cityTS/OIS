@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
 import { createPersistedState } from 'vuex-electron'
 
 import modules from './modules'

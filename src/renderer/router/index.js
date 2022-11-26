@@ -20,14 +20,14 @@ export default new Router({
     {
       path: '/',
       name: 'console-page',
-      component: require('@/views/ConsolePage.vue').default
-      // beforeEnter: (to, from, next) => {
-      //   let cookie = document.cookie.split(';')[0]
-      //   if (cookie.length === 0) next({path: '/login'})
-      //   else {
-      //     next()
-      //   }
-      // }
+      component: require('@/views/ConsolePage.vue').default,
+      beforeEnter: (to, from, next) => {
+        let cookie = document.cookie.split(';')[0]
+        if (cookie.length === 0) next({path: '/login'})
+        else {
+          next()
+        }
+      }
     }
   ]
 })

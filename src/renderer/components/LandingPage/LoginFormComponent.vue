@@ -1,11 +1,14 @@
 <template>
   <div class="login">
-    <el-form ref="loginForm" :model="loginInfo" :rules="loginRules" label-width="50px" label-position="right">
+    <el-form ref="loginForm" :model="loginInfo" :rules="loginRules" label-width="70px" label-position="right">
       <el-form-item label="学号" prop="studentNumber">
         <el-input v-model="loginInfo.studentNumber"></el-input>
       </el-form-item>
       <el-form-item label="姓名" prop="name">
         <el-input v-model="loginInfo.name"></el-input>
+      </el-form-item>
+      <el-form-item label="考试码" prop="examinationId">
+        <el-input v-model="loginInfo.examinationId"></el-input>
       </el-form-item>
     </el-form>
     <button round @click="login">登录系统</button>
@@ -19,7 +22,8 @@ export default {
     return {
       loginInfo: {
         studentNumber: undefined,
-        name: undefined
+        name: undefined,
+        examinationId: undefined
       },
       loginRules: {
         name: [
@@ -29,6 +33,9 @@ export default {
         studentNumber: [
           {required: true, message: '请输入学号', trigger: 'blur'},
           {pattern: /^\d{10}$/, message: '学号必须为10位数字', trigger: 'change'}
+        ],
+        examinationId: [
+          {required: true, message: '请输入考试码', trigger: 'blur'}
         ]
       }
     }
@@ -37,7 +44,15 @@ export default {
     login () {
       this.$refs['loginForm'].validate((valid) => {
         if (valid) {
-          // TODO 登录请求
+          this.$http.post('/login', this.loginInfo).then((res) => {
+            if (res.code === 0) {
+              this.$message.success(this.loginInfo.name + ',欢迎您')
+            } else {
+              this.$message.error(res.msg)
+            }
+          }).catch(() => {
+            this.$message.error('连接服务器失败,请检查网络配置')
+          })
         } else {
           console.log('出错啦')
         }
@@ -53,7 +68,7 @@ export default {
   width: 222px;
 }
 .login {
-  margin-top: 40px;
+  margin-top: 10px;
 }
 
 .login button {
