@@ -1,5 +1,6 @@
 const state = {
-  main: 0
+  main: 0,
+  recorder: undefined
 }
 
 const mutations = {
@@ -8,6 +9,9 @@ const mutations = {
   },
   INCREMENT_MAIN_COUNTER (state) {
     state.main++
+  },
+  SET_RECORDER (state, recorder) {
+    state.recorder = recorder
   }
 }
 
@@ -15,6 +19,9 @@ const actions = {
   someAsyncTask ({ commit }) {
     // do something async
     commit('INCREMENT_MAIN_COUNTER')
+  },
+  setRecorder ({commit}, data) {
+    commit('SET_RECORDER', data)
   }
 }
 

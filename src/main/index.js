@@ -1,4 +1,4 @@
-import {app, BrowserWindow, Menu} from 'electron'
+import {app, BrowserWindow, Menu, globalShortcut, Tray} from 'electron'
 import qon from 'qiao-is-online'
 import '../renderer/store'
 
@@ -33,25 +33,55 @@ function createWindow () {
     })
 
     mainWindow.loadURL(winURL)
-
-    mainWindow.on('closed', () => {
-        mainWindow = null
+    // mainWindow.loadFile(require('path').join(__dirname, 'text.html'))
+    mainWindow.on('close', (e) => {
+        // mainWindow = null
+        e.preventDefault()
+        mainWindow.hide()
     })
-
+    // try {
+    //     mainWindow.webPreferences.send('update-log', '测试')
+    // } catch (e) {
+    //     console.log(e)
+    // }
     // 取消默认菜单栏
     Menu.setApplicationMenu(null)
 }
+let tray
 app.on('ready', () => {
+    globalShortcut.register('F5', () => {
+        return false
+    })
+    globalShortcut.register('Ctrl + R', () => {
+        return false
+    })
+    tray = new Tray(require('path').join(__dirname, '../renderer/assets/img/dx-logo.png'))
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: '显示界面',
+            click: () => {
+                if (!mainWindow.isVisible()) {
+                    mainWindow.show()
+                }
+            }
+        }
+    ])
+    tray.setToolTip('OIS-广西大学在线监考系统')
+    tray.on('click', () => {
+        mainWindow.show()
+    })
+    tray.setContextMenu(contextMenu)
     createWindow()
     detectUSB()
     detectServerConnection()
     detectInternetConnection()
 })
-
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit()
-    }
+app.on('window-all-closed', (e) => {
+    // if (process.platform !== 'darwin') {
+    //     app.quit()
+    // }
+    e.preventDefault()
+    // mainWindow.hide()
 })
 
 app.on('activate', () => {
@@ -89,7 +119,11 @@ function logger (str) {
     let logMsg = getFormatTime() + ' ' + str
     log.log(logMsg)
     // TODO 将异常发送服务器
-    // mainWindow.webPreferences.send('update-log', logMsg)
+    // try {
+    //     mainWindow.webPreferences.send('update-log', logMsg)
+    // } catch (e) {
+    //     console.log(e)
+    // }
 }
 
 /**
@@ -139,9 +173,14 @@ async function detectUSB () {
     while (true) {
         child.exec(require('path').join(__dirname, 'USB.exe'), (error, stdout, stderr) => {
             if (error) {
-                console.log(error)
+                logger('[异常] 移动硬盘检测系统故障:' + error)
+                return
             }
-            logger('[异常] 检测到移动硬盘' + stdout.replace('?', '个'))
+            if (stdout !== 'safe') {
+                logger('[异常] 检测到移动硬盘' + stdout.replace('?', '个'))
+            } else {
+                logger('[信息] 移动硬盘检测无异常')
+            }
         })
         await sleep(20000)
     }

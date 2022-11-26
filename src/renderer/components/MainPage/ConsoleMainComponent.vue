@@ -1,40 +1,20 @@
 <template>
   <div class="logo">
     <p>监控日志</p>
-    <el-input
+    <el-input>
         type="textarea"
-        placeholder="暂无数据..."
         disabled
-        v-model="textarea">
+        placeholder="暂无数据..."
     </el-input>
   </div>
 </template>
 
 <script>
-export default {
-  data () {
-    return {
-      textarea: ''
-    }
-  },
-  mounted () {
-    this.getMainProcessLogs()
-  },
-  methods: {
-     getMainProcessLogs () {
-      window.electronAPI.getLogs((event, value) => {
-        this.textarea = value + '\n' + this.textarea
-      })
-      // if (logs.length !== 0) {
-      //   let text = ''
-      //   for (let i = 0; i < logs.length; i++) {
-      //     text += logs[i]
-      //   }
-      //   this.textarea = text
-      // }
-    }
-  }
-}
+// window.electronAPI.getLogs((_event, value) => {
+//   console.log(value)
+//   let text = document.querySelector('input')
+//   text.innerText = value + '\n' + text.innerText
+// })
 </script>
 
 <style>
