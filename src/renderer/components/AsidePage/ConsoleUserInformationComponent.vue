@@ -121,7 +121,8 @@ export default {
           this.count++
           this.stopRecord()
           this.screenSharing()
-        }, 60000)
+        }, 600000)
+        // 10min save
       }
     }
   },
