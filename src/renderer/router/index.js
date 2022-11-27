@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
+import store from '../store'
 Vue.use(Router)
 
 export default new Router({
@@ -10,8 +10,7 @@ export default new Router({
       name: 'login-page',
       component: require('@/views/LoginPage.vue').default,
       beforeEnter: (to, from, next) => {
-        let cookie = document.cookie.split(';')[0]
-        if (cookie.length === 0) next()
+        if (store.state.Token.name === undefined) next()
         else {
           next({path: '/'})
         }
@@ -22,11 +21,10 @@ export default new Router({
       name: 'console-page',
       component: require('@/views/ConsolePage.vue').default,
       beforeEnter: (to, from, next) => {
-        let cookie = document.cookie.split(';')[0]
-        if (cookie.length === 0) next({path: '/login'})
-        else {
-          next()
+        if (store.state.Token.name === undefined) {
+          next({path: '/login'})
         }
+        next()
       }
     }
   ]

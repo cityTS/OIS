@@ -1,20 +1,44 @@
 <template>
   <div class="logo">
-    <p>监控日志</p>
-    <el-input>
-        type="textarea"
-        disabled
-        placeholder="暂无数据..."
-    </el-input>
+    <h1>监控日志</h1>
+    <div class="logs">
+      {{$store.state.Logs.logList}}
+<!--      {{logs}}-->
+    </div>
   </div>
 </template>
 
 <script>
-// window.electronAPI.getLogs((_event, value) => {
-//   console.log(value)
-//   let text = document.querySelector('input')
-//   text.innerText = value + '\n' + text.innerText
-// })
+export default {
+  data () {
+    return {
+      logs: this.$store.state.Logs.logList,
+      timer: null
+    }
+  },
+  methods: {
+    getLogs () {
+      this.logs = this.$store.state.Logs.logList
+    },
+    setTimer () {
+      if (this.timer == null) {
+        this.timer = setInterval(() => {
+          this.getLogs()
+        }, 5000)
+        // 5s save
+      }
+    }
+  },
+  created () {
+    clearInterval(this.timer)
+    this.timer = null
+    this.setTimer()
+  },
+  destroyed () {
+    clearInterval(this.timer)
+    this.timer = null
+  }
+}
 </script>
 
 <style>
@@ -23,7 +47,12 @@
   /*overflow-y: hidden*/
 }
 
-.logo p {
+.logo h1 {
   font-size: 25px;
+}
+.logs {
+  white-space: pre-line;
+  font-size: 15px;
+  height: 400px;
 }
 </style>

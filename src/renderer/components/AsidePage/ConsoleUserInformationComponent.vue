@@ -8,6 +8,7 @@
 <!--    <div class="big-video" id="big-video" style="width: 100%; margin-top: 110px">-->
 <!--      <video id="camera" style="width: 100%"></video>-->
 <!--    </div>-->
+    <el-button class="out-button" @click="out">退出登录</el-button>
   </div>
 </template>
 <script>
@@ -32,7 +33,6 @@ export default {
   methods: {
     screenSharing () {
       desktopCapturer.getSources({types: ['window', 'screen']}).then((sources) => {
-        console.log(sources)
         for (const source of sources) {
           if (source.name === 'Entire Screen') {
             this.getInitStream(source)
@@ -51,7 +51,6 @@ export default {
           }
         }
       }).then(stream => {
-        console.log(stream)
         this.previewStream(stream)
         this.createRecorder(stream)
       })
@@ -67,7 +66,6 @@ export default {
       video.onloadedmetadata = e => video.play()
     },
     createRecorder (stream) {
-      console.log('创建记录单元')
       this.recorder = new MediaRecorder(stream)
       this.recorder.start()
       this.recorder.ondataavailable = event => {
@@ -79,14 +77,14 @@ export default {
       this.recorder.onerror = err => {
         console.log('[异常] 视频录制系统异常:' + err)
       }
-      this.$store.commit('SET_RECORDER', this.recorder)
+      // this.$store.dispatch('setRecorder', this.recorder)
       // console.log(this.$store.state.Counter.recorder)
       // console.log(this.recorder)
     },
     getFormatTime () {
       let date = new Date()
-      let month = date.getMonth()
-      let day = date.getDay()
+      let month = date.getMonth() + 1
+      let day = date.getDate()
       let hour = date.getHours()
       let minute = date.getMinutes()
       let second = date.getSeconds()
@@ -97,7 +95,6 @@ export default {
       return date.getFullYear() + '' + month + '' + day + hour + '' + minute + '' + second
     },
     saveMedia (blob) {
-      console.log('开始设置保存信息')
       let reader = new FileReader()
       reader.onload = () => {
         let buffer = Buffer.from(reader.result)
@@ -105,25 +102,75 @@ export default {
         let path = date + '-ois.mp4'
         fs.writeFile(path, buffer, {}, (err, res) => {
           if (err) return console.error(err)
-          console.log(res)
         })
       }
       reader.onerror = err => console.log('[异常] 视频录制系统异常:' + err)
       reader.readAsArrayBuffer(blob)
     },
     stopRecord () {
-      this.$store.state.Counter.recorder.stop()
+      // this.$store.state.Counter.recorder.stop()
+      this.recorder.stop()
     },
     setTimer () {
       if (this.timer == null) {
         this.timer = setInterval(() => {
-          console.log(this.count)
-          this.count++
           this.stopRecord()
           this.screenSharing()
         }, 600000)
         // 10min save
       }
+    },
+    checkOut (value) {
+      if (value === '我已知晓退出后不可再次登录') {
+        return true
+      }
+      return false
+    },
+    out () {
+      this.$prompt(`<p>请输入：<span style="color: red"><i>我已知晓退出后不可再次登录</i></span></p>`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputValidator: this.checkOut,
+        inputErrorMessage: '验证不正确',
+        dangerouslyUseHTMLString: true
+      }).then(async (value) => {
+        // this.$http.post('/logs', {name: this.$store.state.Token.name, level: '信息', content: this.getFormatTime() + '-' + this.$store.state.Token.name + ':' + '退出登录', examinationId: this.$store.state.Token.examinationId})
+        let code
+        await this.$http.get('/login').then(res => {
+          code = res.code
+        }).catch(() => {
+          code = 1
+        })
+        console.log(code)
+        if (code !== 0) {
+          this.$message({
+            type: 'info',
+            message: '服务器连接异常，推出失败'
+          })
+          return
+        }
+        // 清空日志
+        console.log(value)
+        console.log(this)
+        console.log(this.$store)
+        console.log(this.$store.state)
+        console.log(this.$store.state.Token)
+        console.log(this.$store.state.Token.name)
+        await this.$store.dispatch('clearToken')
+        await this.$store.dispatch('clearLog')
+        console.log(this.$store.state.Token.name)
+        this.$message({
+          type: 'success',
+          message: '退出成功'
+        })
+        // for (let i = 0; i < 10000000; i++) {}
+        await this.$router.push({path: '/login'})
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消退出'
+        })
+      })
     }
   },
   created () {
@@ -139,5 +186,11 @@ export default {
 </script>
 
 <style>
-
+.jk {
+  display:flex;
+  flex-direction:column;
+}
+.out-button {
+  margin-top:auto
+}
 </style>

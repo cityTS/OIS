@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import store from '../store'
 const request = axios.create({
     baseURL: 'http://localhost:8010/api',
     timeout: 100000
@@ -8,7 +8,12 @@ const request = axios.create({
 // request 拦截器
 request.interceptors.request.use(config => {
     config.headers['Content-Type'] = 'application/json;charset=utf-8'
-
+    let name = store.state.Token.name
+    let studentNumber = store.state.Token.studentNumber
+    let examinationId = store.state.Token.examinationId
+    config.headers['name'] = encodeURIComponent(name)
+    config.headers['studentNumber'] = studentNumber
+    config.headers['examinationId'] = examinationId
     // let usertoken = localStorage.getItem("token")?JSON.parse(localStorage.getItem("token")):null
     return config
 }, error => {

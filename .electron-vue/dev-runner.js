@@ -66,7 +66,7 @@ function startRenderer () {
         quiet: true,
         hot: true,
         before (app, ctx) {
-          // app.use(hotMiddleware)
+          app.use(hotMiddleware)
           ctx.middleware.waitUntilValid(() => {
             resolve()
           })
@@ -128,7 +128,7 @@ function startElectron () {
   }
 
   electronProcess = spawn(electron, args)
-  
+
   electronProcess.stdout.on('data', data => {
     electronLog(data, 'blue')
   })

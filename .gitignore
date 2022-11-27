@@ -10,3 +10,5 @@ thumbs.db
 !.gitkeep
 .idea/
 src/main/logs.log
+
+*.mp4

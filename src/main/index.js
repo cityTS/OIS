@@ -1,6 +1,6 @@
-import {app, BrowserWindow, Menu, globalShortcut, Tray} from 'electron'
+import {app, BrowserWindow, Menu, Tray, globalShortcut} from 'electron'
 import qon from 'qiao-is-online'
-import '../renderer/store'
+import store from '../renderer/store'
 
 /**
  * Set `__static` path to static files in production
@@ -28,7 +28,7 @@ function createWindow () {
             nodeIntegration: true,
             contextIsolation: false, // 是否在独立 JavaScript 环境中运行 Electron API和指定的preload 脚本
             enableRemoteModule: true, // 打开remote模块
-            preload: require('path').join(__dirname, 'preload.js')
+            webSecurity: false
         }
     })
 
@@ -39,6 +39,14 @@ function createWindow () {
         e.preventDefault()
         mainWindow.hide()
     })
+    // mainWindow.webContents.on('before-input-event', (event, input) => {
+    //     console.log(input.key.toLowerCase())
+    //     console.log(input.control)
+    //     if ((input.control && input.key.toLowerCase() === 'r') || input.key.toLowerCase() === 'f5' || (input.control && input.key.toLowerCase() === 'i')) {
+    //         console.log('Pressed')
+    //         event.preventDefault()
+    //     }
+    // })
     // try {
     //     mainWindow.webPreferences.send('update-log', '测试')
     // } catch (e) {
@@ -49,12 +57,6 @@ function createWindow () {
 }
 let tray
 app.on('ready', () => {
-    globalShortcut.register('F5', () => {
-        return false
-    })
-    globalShortcut.register('Ctrl + R', () => {
-        return false
-    })
     tray = new Tray(require('path').join(__dirname, '../renderer/assets/img/dx-logo.png'))
     const contextMenu = Menu.buildFromTemplate([
         {
@@ -89,7 +91,17 @@ app.on('activate', () => {
         createWindow()
     }
 })
-
+app.on('browser-window-focus', (event, isAlwaysOnTop) => {
+    globalShortcut.register('F5', () => {
+        return false
+    })
+    globalShortcut.register('Ctrl + R', () => {
+        return false
+    })
+})
+app.on('browser-window-blur', (event, isAlwaysOnTop) => {
+    globalShortcut.unregisterAll()
+})
 /**
  * 日志模块
  */
@@ -103,8 +115,8 @@ let log = new console.Console(ws)
 
 function getFormatTime () {
     let date = new Date()
-    let month = date.getMonth()
-    let day = date.getDay()
+    let month = date.getMonth() + 1
+    let day = date.getDate()
     let hour = date.getHours()
     let minute = date.getMinutes()
     let second = date.getSeconds()
@@ -118,6 +130,8 @@ function getFormatTime () {
 function logger (str) {
     let logMsg = getFormatTime() + ' ' + str
     log.log(logMsg)
+    // store.commit('addLog', logMsg)
+    store.dispatch('addLog', logMsg)
     // TODO 将异常发送服务器
     // try {
     //     mainWindow.webPreferences.send('update-log', logMsg)
@@ -140,9 +154,7 @@ async function detectServerConnection () {
     while (true) {
         try {
             let oisStatus = await qon.oisStatus()
-            if (oisStatus === 'online') {
-                logger('[信息] 心跳连接正常♥')
-            } else {
+            if (oisStatus !== 'online') {
                 logger('[异常] 与服务器断连,行为已记录')
             }
         } catch (e) {
@@ -178,8 +190,6 @@ async function detectUSB () {
             }
             if (stdout !== 'safe') {
                 logger('[异常] 检测到移动硬盘' + stdout.replace('?', '个'))
-            } else {
-                logger('[信息] 移动硬盘检测无异常')
             }
         })
         await sleep(20000)

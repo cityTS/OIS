@@ -44,17 +44,17 @@ export default {
     login () {
       this.$refs['loginForm'].validate((valid) => {
         if (valid) {
-          this.$http.post('/login', this.loginInfo).then((res) => {
+          this.$http.post('/login', this.loginInfo).then(async (res) => {
             if (res.code === 0) {
               this.$message.success(this.loginInfo.name + ',欢迎您')
+              await this.$store.dispatch('setToken', [this.loginInfo.name, this.loginInfo.studentNumber, this.loginInfo.examinationId])
+              this.$router.push({path: '/'})
             } else {
               this.$message.error(res.msg)
             }
           }).catch(() => {
             this.$message.error('连接服务器失败,请检查网络配置')
           })
-        } else {
-          console.log('出错啦')
         }
       })
     }
