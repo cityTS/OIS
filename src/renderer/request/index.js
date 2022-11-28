@@ -1,4 +1,5 @@
 import axios from 'axios'
+const storage = require('electron-localstorage')
 const request = axios.create({
     baseURL: 'http://localhost:8010/api',
     timeout: 100000
@@ -10,9 +11,9 @@ request.interceptors.request.use(config => {
     // let name = store.state.Token.name
     // let studentNumber = store.state.Token.studentNumber
     // let examinationId = store.state.Token.examinationId
-    let name = localStorage.getItem('name')
-    let studentNumber = localStorage.getItem('studentNumber')
-    let examinationId = localStorage.getItem('examinationId')
+    let name = storage.getItem('name')
+    let studentNumber = storage.getItem('studentNumber')
+    let examinationId = storage.getItem('examinationId')
     config.headers['name'] = encodeURIComponent(name)
     config.headers['studentNumber'] = studentNumber
     config.headers['examinationId'] = examinationId

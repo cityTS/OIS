@@ -1,7 +1,8 @@
 import {app, BrowserWindow, Menu, Tray, globalShortcut} from 'electron'
 import qon from 'qiao-is-online'
 import store from '../renderer/store'
-
+const axios = require('axios')
+const storage = require('electron-localstorage')
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -127,12 +128,18 @@ function getFormatTime () {
     return date.getFullYear() + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second
 }
 
-function logger (str) {
-    let logMsg = getFormatTime() + ' ' + str
+let safeList = []
+
+function logger (level, str) {
+    let logMsg = getFormatTime() + ' [' + level + '] ' + str
     log.log(logMsg)
     // store.commit('addLog', logMsg)
-    store.dispatch('addLog', logMsg)
-    // TODO 将异常发送服务器
+    if (storage.getItem('name') !== '' && level === '异常') {
+        store.dispatch('addLog', logMsg)
+        axios.post('http://localhost:8010/api/logs', {name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}).catch(() => { safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}) }).catch(() => {
+            safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')})
+        })
+    }
     // try {
     //     mainWindow.webPreferences.send('update-log', logMsg)
     // } catch (e) {
@@ -150,27 +157,35 @@ function sleep (ms) {
 }
 
 async function detectServerConnection () {
-    logger('[信息] 开始与服务器建立心跳连接')
+    logger('信息', '开始与服务器建立心跳连接')
     while (true) {
         try {
             let oisStatus = await qon.oisStatus()
             if (oisStatus !== 'online') {
-                logger('[异常] 与服务器断连,行为已记录')
+                logger('异常', '与服务器断连,行为已记录')
+            } else {
+                let tmpList = safeList
+                safeList.length = 0
+                for (let idx = 0; idx < tmpList.length; idx++) {
+                    axios.post('http://localhost:8010/api/logs', tmpList[idx]).catch(() => {
+                        safeList.append(tmpList[idx])
+                    })
+                }
             }
         } catch (e) {
-            logger('[异常] 与服务器断连,行为已记录')
+            logger('异常', '与服务器断连,行为已记录')
         }
         await sleep(20000)
     }
 }
 
 async function detectInternetConnection () {
-    logger('[信息] 网络监控开启成功')
+    logger('信息', '网络监控开启成功')
     while (true) {
         let isOnline = await qon.isOnline(false)
         // logger('[信息] 网络检测结果: ' + isOnline)
         if (isOnline === 'online') {
-            logger('[异常] 检测到该考试环境已连通网络,行为已记录')
+            logger('异常', '检测到该考试环境已连通网络,行为已记录')
         }
         await sleep(20000)
     }
@@ -181,15 +196,15 @@ async function detectInternetConnection () {
  */
 const child = require('child_process')
 async function detectUSB () {
-    logger('[信息] 移动硬盘检测开启成功')
+    logger('信息', '移动硬盘检测开启成功')
     while (true) {
         child.exec(require('path').join(__dirname, 'USB.exe'), (error, stdout, stderr) => {
             if (error) {
-                logger('[异常] 移动硬盘检测系统故障:' + error)
+                logger('异常', '移动硬盘检测系统故障:' + error)
                 return
             }
             if (stdout !== 'safe') {
-                logger('[异常] 检测到移动硬盘' + stdout.replace('?', '个'))
+                logger('异常', '检测到移动硬盘' + stdout.replace('?', '个'))
             }
         })
         await sleep(20000)
