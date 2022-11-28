@@ -133,38 +133,32 @@ export default {
         inputValidator: this.checkOut,
         inputErrorMessage: '验证不正确',
         dangerouslyUseHTMLString: true
-      }).then(async (value) => {
+      }).then((value) => {
         // this.$http.post('/logs', {name: this.$store.state.Token.name, level: '信息', content: this.getFormatTime() + '-' + this.$store.state.Token.name + ':' + '退出登录', examinationId: this.$store.state.Token.examinationId})
-        let code
-        await this.$http.get('/login').then(res => {
-          code = res.code
+        this.$http.get('/login').then(res => {
+          if (res.code === 0) {
+            // this.$store.dispatch('clearToken')
+            localStorage.setItem('name', null)
+            localStorage.setItem('studentNumber', null)
+            localStorage.setItem('examinationId', null)
+            this.$store.dispatch('clearLog')
+            this.$message({
+              type: 'success',
+              message: '退出成功'
+            })
+            this.$router.push({path: '/login'})
+          } else {
+            this.$message({
+              type: 'info',
+              message: '服务器连接异常，退出失败'
+            })
+          }
         }).catch(() => {
-          code = 1
-        })
-        console.log(code)
-        if (code !== 0) {
           this.$message({
             type: 'info',
-            message: '服务器连接异常，推出失败'
+            message: '服务器连接异常，退出失败'
           })
-          return
-        }
-        // 清空日志
-        console.log(value)
-        console.log(this)
-        console.log(this.$store)
-        console.log(this.$store.state)
-        console.log(this.$store.state.Token)
-        console.log(this.$store.state.Token.name)
-        await this.$store.dispatch('clearToken')
-        await this.$store.dispatch('clearLog')
-        console.log(this.$store.state.Token.name)
-        this.$message({
-          type: 'success',
-          message: '退出成功'
         })
-        // for (let i = 0; i < 10000000; i++) {}
-        await this.$router.push({path: '/login'})
       }).catch(() => {
         this.$message({
           type: 'info',

@@ -40,14 +40,23 @@ export default {
       }
     }
   },
+  mounted () {
+    this.unRegister()
+  },
   methods: {
+    unRegister () {
+      this.$http.put('/login')
+    },
     login () {
       this.$refs['loginForm'].validate((valid) => {
         if (valid) {
-          this.$http.post('/login', this.loginInfo).then(async (res) => {
+          this.$http.post('/login', this.loginInfo).then((res) => {
             if (res.code === 0) {
+              localStorage.setItem('name', this.loginInfo.name)
+              localStorage.setItem('studentNumber', this.loginInfo.studentNumber)
+              localStorage.setItem('examinationId', this.loginInfo.examinationId)
+              // this.$store.dispatch('setToken', [this.loginInfo.name, this.loginInfo.studentNumber, this.loginInfo.examinationId])
               this.$message.success(this.loginInfo.name + ',欢迎您')
-              await this.$store.dispatch('setToken', [this.loginInfo.name, this.loginInfo.studentNumber, this.loginInfo.examinationId])
               this.$router.push({path: '/'})
             } else {
               this.$message.error(res.msg)
