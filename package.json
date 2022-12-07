@@ -55,6 +55,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "electron-localstorage": "^1.0.5",
+    "electron-log": "^4.4.8",
     "element-ui": "^2.15.12",
     "polyfill-object.fromentries": "^1.0.1",
     "qiao-is-online": "^0.1.9",

@@ -10,7 +10,7 @@ const storage = require('electron-localstorage')
 if (process.env.NODE_ENV !== 'development') {
     global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
 } else {
-    global.__static = require('path').join(__dirname, '../static').replace(/\\/g, '\\\\')
+    global.__static = require('path').join(__dirname, '../../static').replace(/\\/g, '\\\\')
 }
 
 let mainWindow
@@ -115,7 +115,7 @@ app.on('browser-window-blur', (event, isAlwaysOnTop) => {
 // })
 //
 // let log = new console.Console(ws)
-
+let log = require('electron-log')
 function getFormatTime () {
     let date = new Date()
     let month = date.getMonth() + 1
@@ -135,6 +135,7 @@ let safeList = []
 function logger (level, str) {
     let logMsg = getFormatTime() + ' [' + level + '] ' + str
     // log.log(logMsg)
+    log.info(logMsg)
     // store.commit('addLog', logMsg)
     if (storage.getItem('name') !== '' && level === '异常') {
         store.dispatch('addLog', logMsg)
