@@ -135,11 +135,15 @@ let safeList = []
 function logger (level, str) {
     let logMsg = getFormatTime() + ' [' + level + '] ' + str
     // log.log(logMsg)
-    log.info(logMsg)
+    if (level === '信息') {
+        log.info(str)
+    } else {
+        log.warn(str)
+    }
     // store.commit('addLog', logMsg)
     if (storage.getItem('name') !== '' && level === '异常') {
         store.dispatch('addLog', logMsg)
-        axios.post('http://ois.cn/api/logs', {name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}).catch(() => { safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}) }).catch(() => {
+        axios.post('http://ois.cn/api/logs', {name: storage.getItem('name'), level: '异常', content: storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}).catch(() => { safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}) }).catch(() => {
             safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')})
         })
     }
