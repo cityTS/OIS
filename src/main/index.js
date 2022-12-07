@@ -9,6 +9,8 @@ const storage = require('electron-localstorage')
  */
 if (process.env.NODE_ENV !== 'development') {
     global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+} else {
+    global.__static = require('path').join(__dirname, '../static').replace(/\\/g, '\\\\')
 }
 
 let mainWindow
@@ -106,13 +108,13 @@ app.on('browser-window-blur', (event, isAlwaysOnTop) => {
 /**
  * 日志模块
  */
-let fs = require('fs')
-let ws = fs.createWriteStream(require('path').join(__dirname, 'logs.log').replace(/\\/g, '\\\\'), {
-    flags: 'a', // 文件的打开模式
-    encoding: 'utf8' // 写入文件的字符的编码
-})
-
-let log = new console.Console(ws)
+// let fs = require('fs')
+// let ws = fs.createWriteStream(require('path').join(__dirname, 'logs.log').replace(/\\/g, '\\\\'), {
+//     flags: 'a', // 文件的打开模式
+//     encoding: 'utf8' // 写入文件的字符的编码
+// })
+//
+// let log = new console.Console(ws)
 
 function getFormatTime () {
     let date = new Date()
@@ -132,11 +134,11 @@ let safeList = []
 
 function logger (level, str) {
     let logMsg = getFormatTime() + ' [' + level + '] ' + str
-    log.log(logMsg)
+    // log.log(logMsg)
     // store.commit('addLog', logMsg)
     if (storage.getItem('name') !== '' && level === '异常') {
         store.dispatch('addLog', logMsg)
-        axios.post('http://localhost:8010/api/logs', {name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}).catch(() => { safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}) }).catch(() => {
+        axios.post('http://ois.cn/api/logs', {name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}).catch(() => { safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}) }).catch(() => {
             safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')})
         })
     }
@@ -167,7 +169,7 @@ async function detectServerConnection () {
                 let tmpList = safeList
                 safeList.length = 0
                 for (let idx = 0; idx < tmpList.length; idx++) {
-                    axios.post('http://localhost:8010/api/logs', tmpList[idx]).catch(() => {
+                    axios.post('http://ois.cn/api/logs', tmpList[idx]).catch(() => {
                         safeList.append(tmpList[idx])
                     })
                 }
@@ -198,7 +200,7 @@ const child = require('child_process')
 async function detectUSB () {
     logger('信息', '移动硬盘检测开启成功')
     while (true) {
-        child.exec(require('path').join(__dirname, 'USB.exe'), (error, stdout, stderr) => {
+        child.exec(require('path').join(global.__static, 'USB.exe'), (error, stdout, stderr) => {
             if (error) {
                 logger('异常', '移动硬盘检测系统故障:' + error)
                 return

@@ -24,7 +24,7 @@ module.exports = oisStatus;
 
 var oisDomains = [
     // ois服务器端域名,根据实际情况修改
-    'ois.gxu.edu.cn'
+    'ois.cn'
 ]
 async function oisStatus() {
     var res = await pingDomains(oisDomains);

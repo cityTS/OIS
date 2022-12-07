@@ -1,7 +1,7 @@
 import axios from 'axios'
 const storage = require('electron-localstorage')
 const request = axios.create({
-    baseURL: 'http://localhost:8010/api',
+    baseURL: 'http://ois.cn/api',
     timeout: 100000
 })
 
