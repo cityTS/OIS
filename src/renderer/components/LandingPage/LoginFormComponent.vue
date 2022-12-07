@@ -17,7 +17,6 @@
 
 
 <script>
-const storage = require('electron-localstorage')
 export default {
   data () {
     return {
@@ -53,9 +52,14 @@ export default {
         if (valid) {
           this.$http.post('/login', this.loginInfo).then((res) => {
             if (res.code === 0) {
-              storage.setItem('name', this.loginInfo.name)
-              storage.setItem('studentNumber', this.loginInfo.studentNumber)
-              storage.setItem('examinationId', this.loginInfo.examinationId)
+              try {
+                localStorage.setItem('name', this.loginInfo.name)
+                localStorage.setItem('studentNumber', this.loginInfo.studentNumber)
+                localStorage.setItem('examinationId', this.loginInfo.examinationId)
+                console.log(localStorage.getItem('name'), this.loginInfo.name)
+              } catch (e) {
+                console.log(e)
+              }
               // this.$store.dispatch('setToken', [this.loginInfo.name, this.loginInfo.studentNumber, this.loginInfo.examinationId])
               this.$message.success(this.loginInfo.name + ',欢迎您')
               this.$router.push({path: '/'})

@@ -1,16 +1,17 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-const storage = require('electron-localstorage')
+// const storage = require('electron-localstorage')
 Vue.use(Router)
 
 export default new Router({
+  mode: 'hash',
   routes: [
     {
       path: '/login',
       name: 'login-page',
       component: require('@/views/LoginPage.vue').default,
       beforeEnter: (to, from, next) => {
-        if (storage.getItem('name') === '' || storage.getItem('name') === null) next()
+        if (localStorage.getItem('name') === '' || localStorage.getItem('name') === null) next()
         else {
           next({path: '/'})
         }
@@ -21,7 +22,7 @@ export default new Router({
       name: 'console-page',
       component: require('@/views/ConsolePage.vue').default,
       beforeEnter: (to, from, next) => {
-        if (storage.getItem('name') === '' || storage.getItem('name') === null) {
+        if (localStorage.getItem('name') === '' || localStorage.getItem('name') === null) {
           next({path: '/login'})
         }
         next()

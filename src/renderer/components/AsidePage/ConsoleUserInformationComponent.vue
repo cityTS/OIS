@@ -14,7 +14,6 @@
 <script>
 import {desktopCapturer} from 'electron'
 import fs from 'fs'
-const storage = require('electron-localstorage')
 // window.addEventListener('beforeunload', (ev) => {
 //   // Setting any value other than undefined here will prevent the window
 //   // from closing or reloading
@@ -139,9 +138,7 @@ export default {
         this.$http.get('/login').then(res => {
           if (res.code === 0) {
             // this.$store.dispatch('clearToken')
-            storage.setItem('name', '')
-            storage.setItem('studentNumber', '')
-            storage.setItem('examinationId', '')
+            localStorage.clear()
             this.$store.dispatch('clearLog')
             this.$message({
               type: 'success',

@@ -28,7 +28,7 @@ var oisDomains = [
 ]
 async function oisStatus() {
     var res = await pingDomains(oisDomains);
-    if(!res || res.length != domains.length) throw new Error('no res');
+    if(!res || res.length != oisDomains.length) throw new Error('no res');
 
     if(res[0].alive) {
         return 'online';

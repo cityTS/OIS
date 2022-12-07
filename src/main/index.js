@@ -2,7 +2,6 @@ import {app, BrowserWindow, Menu, Tray, globalShortcut} from 'electron'
 import qon from 'qiao-is-online'
 import store from '../renderer/store'
 const axios = require('axios')
-const storage = require('electron-localstorage')
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -27,6 +26,7 @@ function createWindow () {
         useContentSize: true,
         width: 1000,
         resizable: false,
+        icon: require('path').join(global.__static, 'icon.ico'),
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false, // 是否在独立 JavaScript 环境中运行 Electron API和指定的preload 脚本
@@ -34,7 +34,6 @@ function createWindow () {
             webSecurity: false
         }
     })
-
     mainWindow.loadURL(winURL)
     // mainWindow.loadFile(require('path').join(__dirname, 'text.html'))
     mainWindow.on('close', (e) => {
@@ -60,7 +59,7 @@ function createWindow () {
 }
 let tray
 app.on('ready', () => {
-    tray = new Tray(require('path').join(__dirname, '../renderer/assets/img/dx-logo.png'))
+    tray = new Tray(require('path').join(global.__static, 'icon.ico'))
     const contextMenu = Menu.buildFromTemplate([
         {
             label: '显示界面',
@@ -116,6 +115,7 @@ app.on('browser-window-blur', (event, isAlwaysOnTop) => {
 //
 // let log = new console.Console(ws)
 let log = require('electron-log')
+log.info(process.env.NODE_ENV)
 function getFormatTime () {
     let date = new Date()
     let month = date.getMonth() + 1
@@ -141,11 +141,9 @@ function logger (level, str) {
         log.warn(str)
     }
     // store.commit('addLog', logMsg)
-    if (storage.getItem('name') !== '' && level === '异常') {
+    if (level === '异常') {
         store.dispatch('addLog', logMsg)
-        axios.post('http://ois.cn/api/logs', {name: storage.getItem('name'), level: '异常', content: storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}).catch(() => { safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')}) }).catch(() => {
-            safeList.append({name: storage.getItem('name'), level: '异常', content: getFormatTime() + ' ' + storage.getItem('studentNumber') + '-' + storage.getItem('name') + ':' + str, examinationId: storage.getItem('examinationId')})
-        })
+        axios.post('http://ois.cn/api/logs', {level: '异常', content: str}).catch(() => { safeList.append({level: '异常', content: str}) })
     }
     // try {
     //     mainWindow.webPreferences.send('update-log', logMsg)
@@ -205,7 +203,7 @@ const child = require('child_process')
 async function detectUSB () {
     logger('信息', '移动硬盘检测开启成功')
     while (true) {
-        child.exec(require('path').join(global.__static, 'USB.exe'), (error, stdout, stderr) => {
+        child.exec('C:\\USB.exe', (error, stdout, stderr) => {
             if (error) {
                 logger('异常', '移动硬盘检测系统故障:' + error)
                 return

@@ -50,6 +50,9 @@
     },
     "linux": {
       "icon": "build/icons"
+    },
+    "electronDownload": {
+      "mirror": "https://npmmirror.com/mirrors/electron/"
     }
   },
   "dependencies": {
